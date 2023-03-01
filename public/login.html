@@ -1,0 +1,35 @@
+<html>
+<head>
+	<title>Login | PidgonCoin</title>
+  <link rel="stylesheet" href="https://unpkg.com/purecss@2.0.6/build/pure-min.css" integrity="sha384-Uu6IeWbM+gzNVXJcM9XV3SohHtmWE+3VGi496jvgX1jyvDTXfdK+rfZc8C1Aehk5" crossorigin="anonymous">
+	<link href="//pidgon.com/style.css" rel="stylesheet">
+ <script src="/source/em" crossorigin="anonymous"></script>
+</head>
+
+<body align="center">
+  <h1>Login | PidgonCoin</h1>
+<form class="pure-form" action="/login" method="post">
+<h2>Username</h2>
+<input class="pure-input-1-2" type="text" name="username" placeholder="username">ㅤㅤㅤ<br>
+<h2>Password</h2>
+<input class="pure-input-1-2" id="password" type="password" name="password" placeholder="P4S5W0RD"> <i onclick="hideshow()" id="hs"class="fas fa-eye"></i><br>
+<button type="submit">Log In</button>
+</form>
+  </body>
+  <script>
+
+    
+  function hideshow() {
+  var x = document.getElementById("password");
+  if (x.type === "password") {
+    //show
+    x.type = "text";
+    document.getElementById("hs").className = "fas fa-eye-slash";
+  } else {
+    //hide
+    x.type = "password";
+        document.getElementById("hs").className = "fas fa-eye";
+  }
+}
+  </script>
+  </html>

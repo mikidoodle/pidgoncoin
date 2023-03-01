@@ -1,0 +1,34 @@
+<html>
+<head>
+	<title>Hub | PidgonCard</title>
+	<link rel="stylesheet" href="https://unpkg.com/purecss@2.0.6/build/pure-min.css" integrity="sha384-Uu6IeWbM+gzNVXJcM9XV3SohHtmWE+3VGi496jvgX1jyvDTXfdK+rfZc8C1Aehk5"
+	 crossorigin="anonymous">
+	<link href="//pidgon.com/style.css" rel="stylesheet">
+</head>
+
+<body align="center">
+  <h1> <button style="font-size: 16px" onclick='window.location.href="/"'>Go Back</button>&nbsp;&nbsp;Hub | PidgonCard</h1>
+<p>Everything to do in PidgonCoin</p>
+  <br><br>
+
+<button onclick='window.location.href="/card/mail"'>Email me my Card</button>
+  <p>Get your card in your email inbox so you won't have to sign in.</p>
+ <p>You can also go to <span id="username"></span> to get your card details without signing in.</p>
+  <button onclick='window.location.href="/card"'>View your card</button><br>
+    <button onclick='window.location.href="/card/learn"'>Learn about the card</button><br>
+</body>
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/jquery/3.6.0/jquery.min.js"></script>
+<script>
+    function getCookie(name) {
+  const value = `; ${document.cookie}`;
+  const parts = value.split(`; ${name}=`);
+  if (parts.length === 2) return parts.pop().split(';').shift();
+}
+  
+  var name = getCookie('apcuuid')
+var file = '//coin.pidgon.com/api/json/users/' + name + '.json'
+$.getJSON(file, function( data ) {
+  $(`<a href="https://coin.pidgon.com/card/@${data.username}">coin.pidgon.com/card/@${data.username}</span>`).appendTo('#username')
+})
+</script>
+</html>

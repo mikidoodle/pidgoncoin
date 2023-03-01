@@ -1,0 +1,53 @@
+<html>
+
+<head>
+  <link href="https://fonts.googleapis.com/css?family=Inconsolata" rel="stylesheet">
+  <link href="https://fonts.googleapis.com/css?family=Quicksand" rel="stylesheet">
+  <link rel="stylesheet" href="https://pattern.kivan-works.com/fonts/kredit.css">
+  <link rel="stylesheet" href="//coin.pidgon.com/card/css">
+  <link rel="stylesheet" href="//pidgon.com/style.css">
+</head>
+
+<body class="active">
+ <button style="font-size: 16px" onclick='window.location.href="/user"'>Go Back</button> <button style="font-size: 16px" onclick='window.location.href="/card/hub"'>Go to Hub</button>
+  <div class="floating">
+    <div class="thickness"></div>
+    <div class="thickness"></div>
+    <div class="thickness"></div>
+    <div class="card_body">
+      <div class="logo svg"><h1>PidgonCard</h1> </div>
+      <div class="paywave svg"></div>
+      <div class="chips svg"></div>
+      <div class="card_no text" id="cardno">
+      </div>
+      <div class="valid_date text" style="font-family: 'Rubik';" align="center">
+        
+      </div>
+      <div class="holder text" id="nandc"></div>
+      
+    </div>
+  </div>
+</body>
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/jquery/3.6.0/jquery.min.js"></script>
+<script src="/card/js"></script>
+<script>
+  function getCookie(name) {
+  const value = `; ${document.cookie}`;
+  const parts = value.split(`; ${name}=`);
+  if (parts.length === 2) return parts.pop().split(';').shift();
+}
+
+var name = getCookie('apcuuid')
+
+var submitmanu = "https://coin.pidgon.com/transfer/"
+var file = '//coin.pidgon.com/api/json/users/' + name + '.json'
+$.getJSON(file, function( data ) {
+  var go = 0
+      $(`<p>${data.cardnumber.split('-').join('').match(/.{1,4}/g).join('-')}</p>`).appendTo('#cardno')
+  $(`<h4 id='cardnum'>${data.username} | ${parseInt(data.balance.toFixed(0)).toLocaleString('en-US')} coins</h4>`).appendTo('#nandc')
+})
+
+  // 
+ // 
+</script>
+</html>

@@ -1,0 +1,145 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+   <link href="//pidgon.com/style.css" rel="stylesheet" type="text/css" />
+    <link rel="stylesheet" href="https://unpkg.com/purecss@2.0.6/build/pure-min.css" integrity="sha384-Uu6IeWbM+gzNVXJcM9XV3SohHtmWE+3VGi496jvgX1jyvDTXfdK+rfZc8C1Aehk5" crossorigin="anonymous">
+        <script src="/source/em" crossorigin="anonymous"></script>
+  <title>SuperPidgon Portal | PidgonCoin</title>
+</head>
+<body id="bd" class="light" onload="hid()" align="center">
+   <p onclick="darklight()" align="left"><i id="dm" class="fas fa-moon"></i> <g id="lb">Dark mode</g></p> 
+  <h1 id="greetname"></h1>
+  <p><i class="fas fa-shield-alt"></i> SuperPidgon</p>
+    
+<button onclick="window.location.href = '/out'"><i class="fas fa-sign-out-alt"></i> Log Out</button>
+<button align="right" onclick="add()"><i class="fas fa-wallet"></i> Add money!</button>
+<button align="right" onclick="sub()"><i class="fas fa-wallet"></i> Subtract money!</button>
+
+<form id="tr" class="pure-form" action="/pidgon/add" method="POST">
+    <fieldset>
+      <br>
+        I want to add <input type="number" name="amount" placeholder="123.456" step="any"/> PidgonCoins to <input type="text" name="person" placeholder="username"/>
+        <br><br>
+        <button type="submit">Add!</button>
+    </fieldset>
+</form>
+
+
+<form id="ts" class="pure-form" action="/pidgon/subtract" method="POST">
+    <fieldset>
+      <br>
+        I want to subtract <input type="number" name="amount" placeholder="123.456" step="any"/> PidgonCoins from <input type="text" name="person" placeholder="username"/>
+        <br><br>
+        <button type="submit">Subtract!</button>
+    </fieldset>
+</form>
+
+  <h2 align="left">All Transactions</h2>
+  <p align="left" class="passinfo"></p>
+  <br>
+
+</body>
+<script src="//ajax.googleapis.com/ajax/libs/jquery/2.0.0/jquery.min.js"></script>
+<script>
+const time = new Date().getHours();
+let greeting;
+if (time < 10) {
+  greeting = "good morning";
+} else if (time > 19) {
+  greeting = "good evening";
+} else if(time >= 12 && time < 19) {
+  greeting = "good afternoon";
+} else {
+  greeting = 'hello'
+}
+
+function getCookie(name) {
+  const value = `; ${document.cookie}`;
+  const parts = value.split(`; ${name}=`);
+  if (parts.length === 2) return parts.pop().split(';').shift();
+}
+
+var name = getCookie('apcuuid')
+
+var submitmanu = "https://coin.pidgon.com/transfer/"
+var file = 'https://coin.pidgon.me/api/json/log.json'
+$.getJSON(file, function( data ) {
+  var items = [];
+  var complete = [];
+  $.each( data, function( key, val ) {
+     items.push( "<li>" + val + "<br><g style='color: lightgrey'>"+key+"</g></li><br>" );
+    
+  });
+  if(items.length == 0) {
+    items.push("O_O no transactions yet.")
+  } else {
+    var e = items.length
+  $("<p><i class='fas fa-money-check-alt'></i> Level " + e/5 + " Pidgon</p>").appendTo(".lev")
+  items.push("O_O No more transactions.")
+  }
+     $( "<ul/>", {
+    "class": "my-new-list",
+    html: items.join( "" )
+  }).appendTo( ".passinfo" );
+
+   complete.push("O_o No more transactions.")  
+     $( "<ul/>", {
+    "class": "my-new-list",
+    html: complete.join( "" )
+  }).appendTo( ".complete" );
+
+});
+
+$.getJSON('https://coin.pidgon.com/api/json/users/' + name + '.json', function(data) {
+  $.each(data, function(key, val) {
+    if(key == 'username') {
+      var em = val.replace(/,/g, ".")
+      document.getElementById("greetname").innerHTML = `${greeting}, ${em}!`;
+    }
+  })
+})
+
+function add() {
+    var x = document.getElementById("tr");
+  if (x.style.display === "none") {
+    x.style.display = "block";
+  } else {
+    x.style.display = "none";
+  }
+}
+function sub() {
+    var x = document.getElementById("ts");
+  if (x.style.display === "none") {
+    x.style.display = "block";
+  } else {
+    x.style.display = "none";
+  }
+}
+function hid() {
+  var bu = document.getElementById("tr");
+  bu.style.display = 'none';
+  var bc = document.getElementById("ts");
+  bc.style.display = 'none';
+}
+
+  function darklight() {
+  var x = document.getElementById("bd");
+  if (x.className == "light") {
+    //show
+    x.className = "dark"
+    x.type = "text";
+    document.getElementById("dm").className = "fas fa-sun";
+    document.getElementById("lb").innerHTML = " Light mode";
+  } else {
+    //hide
+    x.className = "light"
+        document.getElementById("dm").className = "fas fa-moon";
+        document.getElementById("lb").innerHTML = " Dark mode";
+  }
+}
+
+//https:, , pkyhgjhvj.mihi, user, uuid
+//   0   1          2         3    4</script>
+</html>

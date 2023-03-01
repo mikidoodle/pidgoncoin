@@ -1,0 +1,23 @@
+{
+  "name": "appachacoin",
+  "version": "1.0.0-alpha",
+  "description": "",
+  "main": "index.js",
+  "scripts": {
+    "test": "echo \"Error: no test specified\" && exit 1"
+  },
+  "keywords": [],
+  "author": "",
+  "license": "ISC",
+  "dependencies": {
+    "body-parser": "^1.19.0",
+    "cookie-parser": "^1.4.6",
+    "easy-json-database": "^1.5.0",
+    "express": "^4.17.1",
+    "js-cookie": "^3.0.1",
+    "nodemailer": "^6.7.1",
+    "pidgonscript": "^3.3.5",
+    "short-uuid": "^4.2.0",
+    "uuid": "^8.3.2"
+  }
+}
