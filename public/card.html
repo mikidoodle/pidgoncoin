@@ -28,7 +28,7 @@
 }
   
   var name = getCookie('apcuuid')
-var file = '//money.pidgon.com/api/json/users/' + name + '.json'
+var file = '/api/json/users/' + name + '.json'
 $.getJSON(file, function( data ) {
   $(`<span>${data.username}</span>`).appendTo('#username')
   $(`<span>${data.cardnumber.split('-').join('').match(/.{1,4}/g).join('-')}</span>`).appendTo('#cardno')
