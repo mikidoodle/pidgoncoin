@@ -66,8 +66,8 @@ function getCookie(name) {
 
 var name = getCookie('apcuuid')
 
-var submitmanu = "https://money.pidgon.com/transfer/"
-var file = 'https://money.pidgon.com/api/json/users/' + name + '.json'
+var submitmanu = "/transfer/"
+var file = '/api/json/users/' + name + '.json'
 $.getJSON(file, function( data ) {
   var items = [];
   var complete = [];
