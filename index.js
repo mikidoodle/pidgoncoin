@@ -8,8 +8,8 @@ var pidgon = require('pidgonscript')
 const transporter = nodemailer.createTransport({
   service: "iCloud",
   auth: {
-    user: "mihirmaroju@icloud.com",
-    pass: process.env['empass']
+    user: "xxx@xxx.com",
+    pass: "xxx"
   }
 })
 var PORT = 3000;
@@ -29,7 +29,6 @@ app.use('/api/json', express.static('db'))
 const short = require('short-uuid');
 const translator = short("0123456789");
 app.get('/', function(req, res) {
-console.log(pidgon.encrypt('636621'))
 if('apcuuid' in req.cookies) {
   var uu = new Database(`./db/users/${req.cookies.apcuuid}.json`)
     if(uu.get('pidgon') == 'yes') {
@@ -153,9 +152,9 @@ app.post('/pidgon/add', function(req, res) {
       var userdb = new Database(`./db/users/${users.get(req.body.person)}.json`)
       userdb.add('balance', amount)
       res.send(`<link href="//pidgon.com/style.css" rel="stylesheet"><body align="center"><h1>O_o</h1>Success! ${amount} pidgonCoins have been added to ${req.body.person}.<br><button onclick='window.location.replace("/")'>Go Home</button></body>`)
-      log.set('pidgonID ' + uud, `Given ${amount} to ${req.body.person} from Ultimate pidgon.`)
+      log.set('pidgonID ' + uud, `Given ${amount} to ${req.body.person} from an Ultimate Pidgon.`)
     } else res.send(`<link href="//pidgon.com/style.css" rel="stylesheet"><body align="center"><h1>O_o</h1>User does not exist.<br><button onclick='window.location.replace("/")'>Go Home</button></body>`)   
-  } else res.send(`<link href="//pidgon.com/style.css" rel="stylesheet"><body align="center"><h1>O_o</h1>You are not an Ultimate pidgon. die.<br><button onclick='window.location.replace("/")'>Go Home</button></body>`)
+  } else res.send(`<link href="//pidgon.com/style.css" rel="stylesheet"><body align="center"><h1>O_o</h1>You are not an Ultimate Pidgon [Admin]. die.<br><button onclick='window.location.replace("/")'>Go Home</button></body>`)
 })
 
 app.post('/pidgon/subtract', function(req, res) {
@@ -169,7 +168,7 @@ app.post('/pidgon/subtract', function(req, res) {
       res.send(`<link href="//pidgon.com/style.css" rel="stylesheet"><body align="center"><h1>O_o</h1>Success! ${amount} pidgonCoins have been subtracted from ${req.body.person}.<br><button onclick='window.location.replace("/")'>Go Home</button></body>`)
       log.set('pidgonID ' + uud, `Subtracted ${amount} from ${req.body.person} by Ultimate pidgon on ${new Date()}`)
     } else res.send(`<link href="//pidgon.com/style.css" rel="stylesheet"><body align="center"><h1>O_o</h1>User does not exist.<br><button onclick='window.location.replace("/")'>Go Home</button></body>`)   
-  } else res.send(`<link href="//pidgon.com/style.css" rel="stylesheet"><body align="center"><h1>O_o</h1>You are not an Ultimate pidgon. die.<br><button onclick='window.location.replace("/")'>Go Home</button></body>`)
+  } else res.send(`<link href="//pidgon.com/style.css" rel="stylesheet"><body align="center"><h1>O_o</h1>You are not an Ultimate Pidgon.<br><button onclick='window.location.replace("/")'>Go Home</button></body>`)
 })
 
 app.get('/user', function(req, res) {
@@ -184,7 +183,7 @@ app.get('/pidgon', function(req, res) {
     var uus = new Database(`./db/users/${req.cookies.apcuuid}.json`) 
     if(uus.get('pidgon') == 'yes') {
       console.log('is pidgon')
-      res.sendFile(path.join(__dirname + '/public/appacha.html'))
+      res.sendFile(path.join(__dirname + '/public/super.html'))
     } else {console.log('not pidgon'); res.redirect('/user')}
 
   } else res.redirect('/login') 
@@ -286,9 +285,6 @@ app.get('/card/mail', function(req, res) {
      res.sendFile(path.join(__dirname + '/public/cardmail.html'))
 })
 
-app.get('/card/hub', function(req, res) {
-     res.sendFile(path.join(__dirname + '/public/card hub.html'))
-})
 app.get('/card/@:name', function(req, res) {
   if(users.has(req.params.name)) {
     var user = new Database(`./db/users/${users.get(req.params.name)}.json`)
@@ -519,7 +515,6 @@ app.post('/card/mail', function(req, res) {
         from: 'noreply@pidgon.com',
         to: req.body.email,
         subject: 'Your PidgonCard!',
-        //text: 'Plaintext version of the message',
         html: `<html>
   <head><style>
     @import url('https://fonts.googleapis.com/css2?family=Rubik:wght@700&display=swap');

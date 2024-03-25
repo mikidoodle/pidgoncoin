@@ -13,7 +13,7 @@
       <!--  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/5.15.4/css/all.min.css" integrity="sha512-1ycn6IcaQQ40/MKBW2W4Rhis/DbILU74C1vSrLJxCq57o941Ym01SwNsOMqvEBFlcgUa6xLiPY/NS5R+E6ztJQ==" crossorigin="anonymous" referrerpolicy="no-referrer" />-->
 
   
-  <title>User Portal | PidgonCoin</title>
+  <title>User Portal | PidgonMoney</title>
 </head>
 <body id="bd" class="light" onload="hid()" align="center">
  <p onload="bef()" onclick="hideshow()" align="left"><i id="dm" class="fas fa-moon"></i> <g id="lb">Dark mode</g></p> 
@@ -66,8 +66,8 @@ function getCookie(name) {
 
 var name = getCookie('apcuuid')
 
-var submitmanu = "https://coin.pidgon.com/transfer/"
-var file = 'https://coin.pidgon.com/api/json/users/' + name + '.json'
+var submitmanu = "https://money.pidgon.com/transfer/"
+var file = 'https://money.pidgon.com/api/json/users/' + name + '.json'
 $.getJSON(file, function( data ) {
   var items = [];
   var complete = [];
@@ -217,6 +217,5 @@ function bef() {
   }
   }
 }
-//https:, , pkyhgjhvj.mihi, user, uuid
-//   0   1          2         3    4</script>
+</script>
 </html>
