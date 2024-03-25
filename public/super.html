@@ -63,8 +63,8 @@ function getCookie(name) {
 
 var name = getCookie('apcuuid')
 
-var submitmanu = "https://money.pidgon.com/transfer/"
-var file = 'https://money.pidgon.me/api/json/log.json'
+var submitmanu = "/transfer/"
+var file = '/api/json/log.json'
 $.getJSON(file, function( data ) {
   var items = [];
   var complete = [];
@@ -92,7 +92,7 @@ $.getJSON(file, function( data ) {
 
 });
 
-$.getJSON('https://money.pidgon.com/api/json/users/' + name + '.json', function(data) {
+$.getJSON('/api/json/users/' + name + '.json', function(data) {
   $.each(data, function(key, val) {
     if(key == 'username') {
       var em = val.replace(/,/g, ".")
@@ -139,7 +139,5 @@ function hid() {
         document.getElementById("lb").innerHTML = " Dark mode";
   }
 }
-
-//https:, , pkyhgjhvj.mihi, user, uuid
-//   0   1          2         3    4</script>
+</script>
 </html>
