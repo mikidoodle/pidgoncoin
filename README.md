@@ -1,5 +1,9 @@
 # Welcome!
-
+In this file:<Br /><Br />
+[Welcome!](#Welcome!)  
+[Screenshots](#Screenshots)  
+[Setup](#Setup)  
+[Improvements](#Improvements)<Br /><Br />
 PidgonCoin is a toy currency I built when I was 10, using (probably the worst stack for this kind of site) HTML/CSS, jQuery, Node.js (via Express.js) and JSON for the database.
 <Br >
 
