@@ -4,7 +4,7 @@ In this file:<Br /><Br />
 [Screenshots](#Screenshots)  
 [Setup](#Setup)  
 [Improvements](#Improvements)<Br /><Br />
-PidgonCoin is a toy currency I built when I was 10, using (probably the worst stack for this kind of site) HTML/CSS, jQuery, Node.js (via Express.js) and JSON for the database.
+PidgonCoin is a toy currency I built when I was 11, using (probably the worst stack for this kind of site) HTML/CSS, jQuery, Node.js (via Express.js) and JSON for the database.
 <Br >
 
 The site is minimal and all options are simple and esasy to understand. Users can log in and sign up without an email and can transfer and mine money. I also had plans for a physical card, so you can see a bit of the early infrastructure for the card on the site.
