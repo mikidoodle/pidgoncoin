@@ -1,180 +1,263 @@
 <!DOCTYPE html>
 <html lang="en">
-<head>
-  <meta charset="UTF-8">
-  <meta name="viewport" content="width=device-width, initial-scale=1.0">
-   <link href="//pidgon.com/style.css" rel="stylesheet" type="text/css" />
-   <link rel="stylesheet" href="https://unpkg.com/purecss@2.0.6/build/pure-min.css" integrity="sha384-Uu6IeWbM+gzNVXJcM9XV3SohHtmWE+3VGi496jvgX1jyvDTXfdK+rfZc8C1Aehk5" crossorigin="anonymous">
-  <style>
-    .badge {
-      letter-spacing: 2px;
-    }
-  </style>
-      <!--  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/5.15.4/css/all.min.css" integrity="sha512-1ycn6IcaQQ40/MKBW2W4Rhis/DbILU74C1vSrLJxCq57o941Ym01SwNsOMqvEBFlcgUa6xLiPY/NS5R+E6ztJQ==" crossorigin="anonymous" referrerpolicy="no-referrer" />-->
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <link href="/style.css" rel="stylesheet" type="text/css" />
+    <link
+      rel="stylesheet"
+      href="https://unpkg.com/purecss@2.0.6/build/pure-min.css"
+      integrity="sha384-Uu6IeWbM+gzNVXJcM9XV3SohHtmWE+3VGi496jvgX1jyvDTXfdK+rfZc8C1Aehk5"
+      crossorigin="anonymous"
+    />
+    <style>
+      .badge {
+        letter-spacing: 2px;
+      }
+    </style>
+    <!--  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/5.15.4/css/all.min.css" integrity="sha512-1ycn6IcaQQ40/MKBW2W4Rhis/DbILU74C1vSrLJxCq57o941Ym01SwNsOMqvEBFlcgUa6xLiPY/NS5R+E6ztJQ==" crossorigin="anonymous" referrerpolicy="no-referrer" />-->
 
-  
-  <title>User Portal | PidgonMoney</title>
-</head>
-<body id="bd" class="light" onload="hid()" align="center">
- <p onload="bef()" onclick="hideshow()" align="left"><i id="dm" class="fas fa-moon"></i> <g id="lb">Dark mode</g></p> 
- <h1 id="greetname"></h1>
-  <p class="bal"></p>
-  <h3 class="lev"></h3>
+    <title>User Portal | PidgonMoney</title>
+  </head>
+  <body id="bd" class="light" onload="hid()" align="center">
+    <!--<p onload="bef()" onclick="hideshow()" align="left">
+      <i id="dm" class="fas fa-moon"></i> <g id="lb">Dark mode</g>
+    </p>-->
+    <h1 id="greetname"></h1>
+    <p class="bal"></p>
+    <h3 class="lev"></h3>
     <h2 hidden>Badges</h2>
-  <p class="badge"></p>
-<button onclick="window.location.href = '/out'"><i class="fas fa-sign-out-alt"></i> Log Out</button><br><br>
-<button align="right" onclick="sub()"><i class="fa-solid fa-wallet"></i> Make a transaction!</button> 
-  <form id="tr" class="pure-form" action="/transfer" method="POST">
-    <fieldset>
-      <br>
-        I want to transfer <input type="number" name="amount" placeholder="123.456" step="any"/> PidgonCoins to <input type="text" name="person" placeholder="username"/> <br><br>and leave a message saying <textarea class="pure-input-1-2"name="message"></textarea>
-        <br><br>
+    <p class="badge"></p>
+    <button onclick="window.location.href = '/out'">
+      <i class="fas fa-sign-out-alt"></i> Log Out</button
+    ><br /><br />
+
+    <div style="display: flex; flex-direction: column;gap:10px">
+      <div style="display: flex; flex-direction: column;gap:10px">
+    <button align="right" onclick="sub()">
+      <i class="fa-solid fa-wallet"></i> Make a transaction!
+    </button>
+    <form id="tr" class="pure-form" action="/transfer" method="POST">
+      <fieldset>
+        <br />
+        I want to transfer
+        <input type="number" name="amount" placeholder="123.456" step="any" />
+        PidgonCoins to
+        <input type="text" name="person" placeholder="username" />
+        <br /><br />and leave a message saying
+        <textarea class="pure-input-1-2" name="message"></textarea> <br /><br />
         <button type="submit">Transfer!</button>
-    </fieldset><br><br>
-</form>
-  <button align="right" onclick="window.location.replace('/card')"><i class="fa-solid fa-credit-card"></i> PidgonCard</button> <br><br>
-  
-<button align="right" onclick="window.location.replace('/mine')"><i class="fa-solid fa-digging"></i> Mine Coins!</button>
-  
-    <button align="right" onclick="window.location.replace('/card/transfer')"><i class="fa-solid fa-money-bill"></i> Card Transaction</button><br><br>
+      </fieldset>
+      <br /><br />
+    </form>
+    <button onclick="window.location.replace('/card')">
+      <i class="fa-solid fa-credit-card"></i> PidgonCard
+    </button>
+  </div>
+  <div style="display: flex; flex-direction: row;gap:10px;width:100%">
+    <button  onclick="window.location.replace('/mine')" style="width:50%">
+      <i class="fa-solid fa-digging"></i> Mine Coins!
+    </button>
 
+    <button onclick="window.location.replace('/card/transfer')" style="width:50%">
+      <i class="fa-solid fa-money-bill"></i> Card Transaction</button
+    >
+    </div>
+  </div>
 
-  <h2 align="left">Your Transactions</h2>
-  <p align="left" class="passinfo"></p>
-  <br>
-  <script src="/source/em" crossorigin="anonymous"></script>
-</body>
-<script src="//ajax.googleapis.com/ajax/libs/jquery/2.0.0/jquery.min.js"></script>
-<script>
-const time = new Date().getHours();
-let greeting;
-if (time < 10) {
-  greeting = "good morning";
-} else if (time > 19) {
-  greeting = "good evening";
-} else if(time >= 12 && time < 19) {
-  greeting = "good afternoon";
-} else {
-  greeting = 'hello'
-}
-
-function getCookie(name) {
-  const value = `; ${document.cookie}`;
-  const parts = value.split(`; ${name}=`);
-  if (parts.length === 2) return parts.pop().split(';').shift();
-}
-
-var name = getCookie('apcuuid')
-
-var submitmanu = "/transfer/"
-var file = '/api/json/users/' + name + '.json'
-$.getJSON(file, function( data ) {
-  var items = [];
-  var complete = [];
-  $.each( data, function( key, val ) {
-    if(key == 'password') {
-     //alert(val)
-    } else if(key == 'username') {
-      var em = val.replace(/,/g, ".")
-      document.getElementById("greetname").innerHTML = `${greeting}, ${em}!`;
-    } else if(key == 'pidgon' || key == 'cardnumber' || key == 'pin') {
-      //yos
-    } else if(key == 'balance') {
-      $(`<p>You have ${parseInt(parseInt(data.balance).toFixed(0)).toLocaleString('en-US')} PidgonCoins in your account.</p>`).appendTo(".bal") 
-    } else if(key == 'dev') {
-      if(val == 'yes') {
-      $(`<p><i class='fas fa-code'></i> Developer</p>`).appendTo('.lev')
-      }
+    <h2 textalign="left">Your Transactions</h2>
+    <p textalign="left" class="passinfo"></p>
+    <br />
+    <script src="/source/em" crossorigin="anonymous"></script>
+  </body>
+  <script src="//ajax.googleapis.com/ajax/libs/jquery/2.0.0/jquery.min.js"></script>
+  <script>
+    const time = new Date().getHours();
+    let greeting;
+    if (time < 10) {
+      greeting = "good morning";
+    } else if (time > 19) {
+      greeting = "good evening";
+    } else if (time >= 12 && time < 19) {
+      greeting = "good afternoon";
     } else {
-      var vaspl = val.split(' ')
-      var tim = vaspl.slice(-10)
-      var tm = tim.join().replace(/,/g, ' ')
-      var vj = vaspl.join().replace(/,/g, ' ').replace(tm, '')
-     items.push( "<li>" + vj + "<br><g style='color: lightgrey'>"+tm+"</g><br><g style='color: lightgrey'>"+key+"</g></li><br>" );
-      }
-    
-  });
-  if(items.length == 0) {
-    items.push("O_O You haven't made any transactions. Click the button to make one anytime!")
-  } else {
-    var e = items.length
-    if(e/5 >= 1 && e/5 <= 2.9) {
-      $("<p><i class='fas fa-seedling'></i> Level " + e/5 + " Pidgon</p>").appendTo(".lev")
-      $("<i class='fas fa-seedling'></i>").appendTo('.badge')
-    } else if(e/5 >= 3 && e/5 <= 4.9) {
-      $("<p><i class='fas fa-feather-alt'></i> Level " + e/5 + " Pidgon</p>").appendTo(".lev")
-      $("<i class='fas fa-seedling'></i>  ").appendTo('.badge')
-      $("<i class='fas fa-feather-alt'></i>  ").appendTo('.badge')
-    } else if(e/5 >= 5 && e/5 <= 8.9) {
-      $("<p><i class='fas fa-dove'></i> Level " + e/5 + " Pidgon</p>").appendTo(".lev")
-      $("<i class='fas fa-seedling'></i>  ").appendTo('.badge')
-      $("<i class='fas fa-feather-alt'></i>  ").appendTo('.badge')
-      $("<i class='fas fa-dove'></i>  ").appendTo('.badge')
-    } else if(e/5 >= 9 && e/5 <= 11.9) {
-      $("<p><i class='fas fa-paper-plane'></i> Level " + e/5 + " Pidgon</p>").appendTo(".lev")
-      $("<i class='fas fa-seedling'></i>  ").appendTo('.badge')
-      $("<i class='fas fa-feather-alt'></i>  ").appendTo('.badge')
-      $("<i class='fas fa-dove'></i>  ").appendTo('.badge')
-      $("<i class='fas fa-paper-plane'></i>  ").appendTo('.badge')   
-    } else if(e/5 >= 12 && e/5 <= 15.9) {
-      $("<p><i class='fas fa-helicopter'></i> Level " + e/5 + " Pidgon</p>").appendTo(".lev")
-      $("<i class='fas fa-seedling'></i>  ").appendTo('.badge')
-      $("<i class='fas fa-feather-alt'></i>  ").appendTo('.badge')
-      $("<i class='fas fa-dove'></i>  ").appendTo('.badge')
-      $("<i class='fas fa-paper-plane'></i>  ").appendTo('.badge')   
-      $("<i class='fas fa-helicopter'></i>  ").appendTo('.badge')   
-    } else if(e/5 >= 16 && e/5 <= 24.9) {
-      $("<p><i class='fas fa-space-shuttle'></i> Level " + e/5 + " Pidgon</p>").appendTo(".lev")
-      $("<i class='fas fa-seedling'></i>  ").appendTo('.badge')
-      $("<i class='fas fa-feather-alt'></i>  ").appendTo('.badge')
-      $("<i class='fas fa-dove'></i>  ").appendTo('.badge')
-      $("<i class='fas fa-paper-plane'></i>  ").appendTo('.badge')   
-      $("<i class='fas fa-helicopter'></i>  ").appendTo('.badge')   
-      $("<i class='fas fa-space-shuttle'></i>  ").appendTo('.badge')   
-    } else if(e/5 >= 25) {
-      $("<p><i class='fas fa-fighter-jet'></i> Level " + e/5 + " Pidgon</p>").appendTo(".lev")
-      $("<i class='fas fa-seedling'></i> ").appendTo('.badge')
-      $("<i class='fas fa-feather-alt'></i> ").appendTo('.badge')
-      $("<i class='fas fa-dove'></i> ").appendTo('.badge')
-      $("<i class='fas fa-paper-plane'></i> ").appendTo('.badge')   
-      $("<i class='fas fa-helicopter'></i>  ").appendTo('.badge')   
-      $("<i class='fas fa-space-shuttle'></i>  ").appendTo('.badge') 
-      $("<i class='fas fa-fighter-jet'></i>  ").appendTo('.badge')   
+      greeting = "hello";
     }
-  //$("<p><i class='fas fa-paper-plane'></i> Level " + e/5 + " Pidgon</p>").appendTo(".lev")
-  var rev = items.reverse()
-  rev.push("O_O There aren't any other transactions you have made. Click the button to make another one anytime!")
-  }
-     $( "<ul/>", {
-    "class": "my-new-list",
-    html: rev.join( "" )
-  }).appendTo( ".passinfo" );
 
-   complete.push("O_o No more transactions.")  
-     $( "<ul/>", {
-    "class": "my-new-list",
-    html: complete.reverse().join( "" )
-  }).appendTo( ".complete" );
+    function getCookie(name) {
+      const value = `; ${document.cookie}`;
+      const parts = value.split(`; ${name}=`);
+      if (parts.length === 2) return parts.pop().split(";").shift();
+    }
 
-});
+    var name = getCookie("apcuuid");
+    var password = getCookie("password");
+    fetch("/verifycreds", {
+      method: "POST",
+      headers: {
+        "Content-Type": "application/json",
+      }
+    })
+      .then((response) => response.json())
+      .then((data) => {
+        console.log(data)
+        if (data.status == false) {
+          alert("Your credentials are invalid. Please log in again.");
+          window.location.replace("/out");
+        }
+      })
+      .catch((error) => {
+        console.log(error);
+        alert(`An error occurred: ${error}`);
+      });
+    var submitmanu = "/transfer/";
+    var file = "/api/json/users/" + name + ".json";
+    $.getJSON(file, function (data) {
+      var items = [];
+      var complete = [];
+      $.each(data, function (key, val) {
+        if (key == "password") {
+          //alert(val)
+        } else if (key == "username") {
+          var em = val.replace(/,/g, ".");
+          document.getElementById(
+            "greetname"
+          ).innerHTML = `${greeting}, ${em}!`;
+        } else if (key == "pidgon" || key == "cardnumber" || key == "pin") {
+          //yos
+        } else if (key == "balance") {
+          $(
+            `<p>You have ${parseInt(
+              parseInt(data.balance).toFixed(0)
+            ).toLocaleString("en-US")} PidgonCoins in your account.</p>`
+          ).appendTo(".bal");
+        } else if (key == "dev") {
+          if (val == "yes") {
+            $(`<p><i class='fas fa-code'></i> Developer</p>`).appendTo(".lev");
+          }
+        } else {
+          var vaspl = val.split(" ");
+          var tim = vaspl.slice(-10);
+          var tm = tim.join().replace(/,/g, " ");
+          var vj = vaspl.join().replace(/,/g, " ").replace(tm, "");
+          items.push(
+            "<li>" +
+              vj +
+              "<br><g style='color: lightgrey'>" +
+              tm +
+              "</g><br><g style='color: lightgrey'>" +
+              key +
+              "</g></li><br>"
+          );
+        }
+      });
+      if (items.length == 0) {
+        items.push(
+          "O_O You haven't made any transactions. Click the button to make one anytime!"
+        );
+      } else {
+        var e = items.length;
+        if (e / 5 >= 1 && e / 5 <= 2.9) {
+          $(
+            "<p><i class='fas fa-seedling'></i> Level " + e / 5 + " Pidgon</p>"
+          ).appendTo(".lev");
+          $("<i class='fas fa-seedling'></i>").appendTo(".badge");
+        } else if (e / 5 >= 3 && e / 5 <= 4.9) {
+          $(
+            "<p><i class='fas fa-feather-alt'></i> Level " +
+              e / 5 +
+              " Pidgon</p>"
+          ).appendTo(".lev");
+          $("<i class='fas fa-seedling'></i>  ").appendTo(".badge");
+          $("<i class='fas fa-feather-alt'></i>  ").appendTo(".badge");
+        } else if (e / 5 >= 5 && e / 5 <= 8.9) {
+          $(
+            "<p><i class='fas fa-dove'></i> Level " + e / 5 + " Pidgon</p>"
+          ).appendTo(".lev");
+          $("<i class='fas fa-seedling'></i>  ").appendTo(".badge");
+          $("<i class='fas fa-feather-alt'></i>  ").appendTo(".badge");
+          $("<i class='fas fa-dove'></i>  ").appendTo(".badge");
+        } else if (e / 5 >= 9 && e / 5 <= 11.9) {
+          $(
+            "<p><i class='fas fa-paper-plane'></i> Level " +
+              e / 5 +
+              " Pidgon</p>"
+          ).appendTo(".lev");
+          $("<i class='fas fa-seedling'></i>  ").appendTo(".badge");
+          $("<i class='fas fa-feather-alt'></i>  ").appendTo(".badge");
+          $("<i class='fas fa-dove'></i>  ").appendTo(".badge");
+          $("<i class='fas fa-paper-plane'></i>  ").appendTo(".badge");
+        } else if (e / 5 >= 12 && e / 5 <= 15.9) {
+          $(
+            "<p><i class='fas fa-helicopter'></i> Level " +
+              e / 5 +
+              " Pidgon</p>"
+          ).appendTo(".lev");
+          $("<i class='fas fa-seedling'></i>  ").appendTo(".badge");
+          $("<i class='fas fa-feather-alt'></i>  ").appendTo(".badge");
+          $("<i class='fas fa-dove'></i>  ").appendTo(".badge");
+          $("<i class='fas fa-paper-plane'></i>  ").appendTo(".badge");
+          $("<i class='fas fa-helicopter'></i>  ").appendTo(".badge");
+        } else if (e / 5 >= 16 && e / 5 <= 24.9) {
+          $(
+            "<p><i class='fas fa-space-shuttle'></i> Level " +
+              e / 5 +
+              " Pidgon</p>"
+          ).appendTo(".lev");
+          $("<i class='fas fa-seedling'></i>  ").appendTo(".badge");
+          $("<i class='fas fa-feather-alt'></i>  ").appendTo(".badge");
+          $("<i class='fas fa-dove'></i>  ").appendTo(".badge");
+          $("<i class='fas fa-paper-plane'></i>  ").appendTo(".badge");
+          $("<i class='fas fa-helicopter'></i>  ").appendTo(".badge");
+          $("<i class='fas fa-space-shuttle'></i>  ").appendTo(".badge");
+        } else if (e / 5 >= 25) {
+          $(
+            "<p><i class='fas fa-fighter-jet'></i> Level " +
+              e / 5 +
+              " Pidgon</p>"
+          ).appendTo(".lev");
+          $("<i class='fas fa-seedling'></i> ").appendTo(".badge");
+          $("<i class='fas fa-feather-alt'></i> ").appendTo(".badge");
+          $("<i class='fas fa-dove'></i> ").appendTo(".badge");
+          $("<i class='fas fa-paper-plane'></i> ").appendTo(".badge");
+          $("<i class='fas fa-helicopter'></i>  ").appendTo(".badge");
+          $("<i class='fas fa-space-shuttle'></i>  ").appendTo(".badge");
+          $("<i class='fas fa-fighter-jet'></i>  ").appendTo(".badge");
+        }
+        //$("<p><i class='fas fa-paper-plane'></i> Level " + e/5 + " Pidgon</p>").appendTo(".lev")
+        var rev = items.reverse();
+        rev.push(
+          "O_O There aren't any other transactions you have made. Click the button to make another one anytime!"
+        );
+      }
+      $("<ul/>", {
+        class: "my-new-list",
+        html: rev.join(""),
+      }).appendTo(".passinfo");
 
+      complete.push("O_o No more transactions.");
+      $("<ul/>", {
+        class: "my-new-list",
+        html: complete.reverse().join(""),
+      }).appendTo(".complete");
+    });
 
-function sub() {
-    var x = document.getElementById("tr");
-  if (x.style.display === "none") {
-    x.style.display = "block";
-  } else {
-    x.style.display = "none";
-  }
-}
+    function sub() {
+      var x = document.getElementById("tr");
+      if (x.style.display === "none") {
+        x.style.display = "block";
+      } else {
+        x.style.display = "none";
+      }
+    }
 
-function hid() {
-  var bu = document.getElementById("tr");
-  bu.style.display = 'none';
-}
-function bef() {
-  console.log('Session Started')
-  /*if(!getCookie('pdgnmode') === null) {
+    function hid() {
+      var bu = document.getElementById("tr");
+      bu.style.display = "none";
+    }
+    function bef() {
+      console.log("Session Started");
+      /*if(!getCookie('pdgnmode') === null) {
   var x = document.getElementById("bd");
   if(getCookie('pdgmode') == 'light') {
       x.className = "light"
@@ -187,35 +270,34 @@ function bef() {
     document.getElementById("lb").innerHTML = " Light mode";
   }
   } else document.cookie = 'pdgnmode=light'*/
-}
-  function hideshow() {
-  var x = document.getElementById("bd");
-  if(getCookie('pdgnmode') == 'light') {
-          x.className = "light"
+    }
+    function hideshow() {
+      var x = document.getElementById("bd");
+      if (getCookie("pdgnmode") == "light") {
+        x.className = "light";
         document.getElementById("dm").className = "fas fa-moon";
         document.getElementById("lb").innerHTML = " Dark mode";
-  } else if(getCookie('pdgnmode') == 'dark') {
-    x.className = "dark"
+      } else if (getCookie("pdgnmode") == "dark") {
+        x.className = "dark";
         x.type = "text";
         document.getElementById("dm").className = "fas fa-sun";
         document.getElementById("lb").innerHTML = " Light mode";
-  } else {
-
-  if (x.className == "light") {
-    //show
-    x.className = "dark"
-    x.type = "text";
-    document.getElementById("dm").className = "fas fa-sun";
-    document.getElementById("lb").innerHTML = " Light mode";
-    document.cookie = "pdgmode=dark";
-  } else {
-    //hide
-    x.className = "light"
-        document.getElementById("dm").className = "fas fa-moon";
-        document.getElementById("lb").innerHTML = " Dark mode";
-    document.cookie = "pdgmode=light";
-  }
-  }
-}
-</script>
+      } else {
+        if (x.className == "light") {
+          //show
+          x.className = "dark";
+          x.type = "text";
+          document.getElementById("dm").className = "fas fa-sun";
+          document.getElementById("lb").innerHTML = " Light mode";
+          document.cookie = "pdgmode=dark";
+        } else {
+          //hide
+          x.className = "light";
+          document.getElementById("dm").className = "fas fa-moon";
+          document.getElementById("lb").innerHTML = " Dark mode";
+          document.cookie = "pdgmode=light";
+        }
+      }
+    }
+  </script>
 </html>

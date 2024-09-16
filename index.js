@@ -1,293 +1,432 @@
-var express = require('express');
+var express = require("express");
 var app = express();
-var path = require('path');
-var nodemailer = require('nodemailer')
-const cookieParser = require('cookie-parser')
-var cook = require('js-cookie')
-var pidgon = require('pidgonscript')
+var path = require("path");
+var nodemailer = require("nodemailer");
+const cookieParser = require("cookie-parser");
+var cook = require("js-cookie");
+var pidgon = require("pidgonscript");
+const bcrypt = require("bcrypt");
+const saltRounds = 10;
 const transporter = nodemailer.createTransport({
   service: "iCloud",
   auth: {
     user: "xxx@xxx.com",
-    pass: "xxx"
-  }
-})
+    pass: "xxx",
+  },
+});
 var PORT = 3000;
-const { v1: uuidv1 } = require('uuid');
-const { v4: uuidv4 } = require('uuid');
-const { v5: uuidv5 } = require('uuid');
+const { v1: uuidv1 } = require("uuid");
+const { v4: uuidv4 } = require("uuid");
+const { v5: uuidv5 } = require("uuid");
 const Database = require("easy-json-database");
-const users = new Database('./db/users.json')
-const log = new Database('./db/log.json')
-const fs = require('fs')
+const users = new Database("./db/users.json");
+const log = new Database("./db/log.json");
+const fs = require("fs");
 const router = express.Router();
-var bodyParser = require('body-parser');
+var bodyParser = require("body-parser");
 app.use(bodyParser.json());
 app.use(cookieParser());
 app.use(bodyParser.urlencoded({ extended: true }));
-app.use('/api/json', express.static('db'))
-const short = require('short-uuid');
+app.use("/api/json", express.static("db"));
+const short = require("short-uuid");
 const translator = short("0123456789");
-app.get('/', function(req, res) {
-if('apcuuid' in req.cookies) {
-  var uu = new Database(`./db/users/${req.cookies.apcuuid}.json`)
-    if(uu.get('pidgon') == 'yes') {
-      res.redirect('/pidgon')
-    } else res.redirect('/user')
-  } else res.sendFile(path.join(__dirname + '/public/index.html'))
-})
-
-app.get('/mine', function(req, res) {
-  res.sendFile(path.join(__dirname + '/public/mine.html'))
-})
-
-app.post('/mine', function(req, res) {
-  var uj = new Database('./db/users/'+req.cookies.apcuuid+'.json')
-  var ud = uuidv4()
-  if(uj.has('username')) {
-    var am = parseFloat(uj.get('balance'))
-    var newam = am + parseFloat(req.body.tSOP)
-    uj.set('balance', newam)
-    res.send(`<link href="//pidgon.com/style.css" rel="stylesheet"><body align="center"><h1>:O</h1>${req.body.tSOP} PidgonCoins have been added to your account! <br> <button onclick='window.location.replace("/")'>Go Home</button></body>`)
-     uj.set('pidgonID ' + ud, `"Mined ${req.body.tSOP} PidgonCoins on ${new Date()}`)
-      log.set('pidgonID ' + ud, `${uj.get('username')} mined ${req.body.tSOP} PidgonCoins on ${new Date()}`) 
-  } else {res.redirect('/login'); res.cookie('apcmine', 'no')}
- 
-})
-
-app.get('/out', function(req, res) {
-res.cookie('apcuuid', '', {
-  expires: new Date(Date.now())
+app.get("/", function (req, res) {
+  if ("apcuuid" in req.cookies) {
+    var uu = new Database(`./db/users/${req.cookies.apcuuid}.json`);
+    if (uu.get("pidgon") == "yes") {
+      res.redirect("/pidgon");
+    } else res.redirect("/user");
+  } else res.sendFile(path.join(__dirname + "/public/index.html"));
 });
-res.redirect('/')
-})
 
-app.get('/login', function(req, res) {
-  res.sendFile(path.join(__dirname + '/public/login.html'))
-})
+app.get("/mine", function (req, res) {
+  res.sendFile(path.join(__dirname + "/public/mine.html"));
+});
 
-app.post('/transfer', function(req, res) {
-  var amount = parseFloat(req.body.amount)
-  var person = req.body.person
-  var user = req.cookies.apcuuid
-  var userdb = new Database(`./db/users/${user}.json`)
-  var username = userdb.get('username')
-  if(amount > 0) {
-    if(amount > 0.001) {
-  if(users.has(person)) {
-    var uu = users.get(person)
-    var uj = new Database(`./db/users/${uu}.json`)
-    if(userdb.get('balance') >= amount) {
-      var uud = uuidv4()
-      if ('message' in req.body) {
-      userdb.subtract('balance', amount)
-      uj.add('balance', amount)
-      var message = req.body.message
-      userdb.set('pidgonID ' + uud, `Transferred ${amount} to "${person}" with message "${message}" on ${new Date()}`)
-      uj.set('pidgonID ' + uud, `"${username}" has given you ${amount} pidgonCoins with a message: "${message}" on ${new Date()}`)
-      log.set('pidgonID ' + uud, `Transferred ${amount} to "${person}" from "${user}" with message on ${new Date()}`)
-      res.send(`<link href="//pidgon.com/style.css" rel="stylesheet"><body align="center"><h1>O_o</h1>Transaction completed! <br> You have transfered ${amount} pidgonCoins to ${person} with the message ${message}! <br> <button onclick="window.location.replace('/appeal/${person}/${uud}/')">Pull Transaction</button><br><button onclick='window.location.replace("/")'>Go Home</button></body>`)
-      } else {
-        userdb.subtract('balance', amount)
-        uj.add('balance', amount)
-        userdb.set('pidgonID ' + uud, `Transferred ${amount} to ${person} on ${new Date()}`)
-        uj.set('pidgonID ' + uud, `"${person}" has given you ${amount} pidgonCoins on ${new Date()}!"`)
-        log.set('pidgonID ' + uud, `Transferred ${amount} to ${person} from ${user} on ${new Date()}`)
-        res.send(`<link href="//pidgon.com/style.css" rel="stylesheet"><body align="center"><h1>O_o</h1>Transaction completed! <br> You have transfered ${amount} pidgonCoins to ${person}! <br> <button onclick="window.location.replace('/appeal/${person}/${uud}/')">Pull Transaction</button><br><button onclick='window.location.replace("/")'>Go Home</button></body>`)
-      }
-      
-    } else res.send(`<link href="//pidgon.com/style.css" rel="stylesheet"><body align="center"><h1>O_o</h1>Transaction failed.<br> you do not have enough money to make that transaction. None of your coins have been removed.<br><button onclick='window.location.replace("/")'>Go Home</button></body>`)
-  } else res.send(`<link href="//pidgon.com/style.css" rel="stylesheet"><body align="center"><h1>O_o</h1>Transaction failed.<br> The recipient does not exist. If you added an "@" symbol at the starting of the username, remove it and try again. None of your coins have been removed.<br><button onclick='window.location.replace("/")'>Go Home</button></body>`)
-  } else res.send(`<link href="//pidgon.com/style.css" rel="stylesheet"><body align="center"><h1>O_o</h1><br>You cannot transfer money lesser than 0.001. <br><button onclick='window.location.replace("/")'>Go Home</button></body>`)
+app.post("/mine", function (req, res) {
+  var uj = new Database("./db/users/" + req.cookies.apcuuid + ".json");
+  var ud = uuidv4();
+  if (uj.has("username")) {
+    var am = parseFloat(uj.get("balance"));
+    var newam = am + parseFloat(req.body.tSOP);
+    uj.set("balance", newam);
+    res.send(
+      `<link href="/style.css" rel="stylesheet"><body align="center"><h1>:O</h1>${req.body.tSOP} PidgonCoins have been added to your account! <br> <button onclick='window.location.replace("/")'>Go Home</button></body>`
+    );
+    uj.set(
+      "pidgonID " + ud,
+      `"Mined ${req.body.tSOP} PidgonCoins on ${new Date()}`
+    );
+    log.set(
+      "pidgonID " + ud,
+      `${uj.get("username")} mined ${
+        req.body.tSOP
+      } PidgonCoins on ${new Date()}`
+    );
   } else {
-    userdb.subtract('balance', 2)
-    res.send(`<link href="//pidgon.com/style.css" rel="stylesheet"><body align="center"><h1>O_o</h1>hold up.<br> You just tried removing money from someone else! 2 pidgonCoins have been removed from your account because you mean.<br><button onclick='window.location.replace("/")'>Go Home</button></body>`)
-    }
-})
-
-app.get('/signup', function(req, res) {
-  res.sendFile(path.join(__dirname + '/public/signup.html'))
-})
-
-app.post('/login', function(req, res) {
-  var ur = req.body.username.toString().replace(/\./g, ',').toLowerCase()
-  console.log(ur)
-  if(users.has(ur)) {
-    var uu = new Database(`./db/users/${users.get(ur)}.json`)
-    if(uu.get('password') == req.body.password) {
-      if(uu.get('pidgon') == 'yes') {
-        res.cookie('apcuuid', users.get(ur))        
-        res.redirect('/pidgon')
-      } else { 
-        res.cookie('apcuuid', users.get(ur))
-        res.redirect('/user')
-        }
-    } res.send(`<link href="//pidgon.com/style.css" rel="stylesheet"><body align="center"><h1>O_o</h1>Your password is wrong. <br><button onclick='window.location.replace("/login")'>Go Back</button></body>`)
-  } else res.send(`<link href="//pidgon.com/style.css" rel="stylesheet"><body align="center"><h1>O_o</h1>username does not exist. <br><button onclick='window.location.replace("/login")'>Go Back</button></body>`)
-})
-
-app.post('/signup', function(req, res) {
-  if(users.has(req.body.username.split('.').join())) {
-    res.send(`<link href="//pidgon.com/style.css" rel="stylesheet"><body align="center"><h1>O_o</h1>This username already exists.<br><button onclick='window.location.replace("/signup")'>Go Back</button></body>`)
-  } else {
-      var uui = uuidv4()
-      var udb = new Database(`./db/users/${uui}.json`)
-      users.set(req.body.username.split('.').join().toLowerCase(), uui)
-      var us = new Database(`./db/users/${uui}.json`)
-      us.set('username', req.body.username.toLowerCase())
-      us.set('password', req.body.password)
-      us.set('pidgon', 'no')
-      us.set('balance', 2)      
-      res.cookie('apcuuid', uui)
-      res.redirect('/user')
+    res.redirect("/login");
+    res.cookie("apcmine", "no");
   }
-})
+});
 
-app.post('/pidgon/add', function(req, res) {
-  var amount = parseFloat(req.body.amount)
-  var appdb = new Database(`./db/users/${req.cookies.apcuuid}.json`)
-  if(appdb.get('pidgon') == 'yes') {
-    if(users.has(req.body.person)) {
-      var uud = uuidv4()
-      var userdb = new Database(`./db/users/${users.get(req.body.person)}.json`)
-      userdb.add('balance', amount)
-      res.send(`<link href="//pidgon.com/style.css" rel="stylesheet"><body align="center"><h1>O_o</h1>Success! ${amount} pidgonCoins have been added to ${req.body.person}.<br><button onclick='window.location.replace("/")'>Go Home</button></body>`)
-      log.set('pidgonID ' + uud, `Given ${amount} to ${req.body.person} from an Ultimate Pidgon.`)
-    } else res.send(`<link href="//pidgon.com/style.css" rel="stylesheet"><body align="center"><h1>O_o</h1>User does not exist.<br><button onclick='window.location.replace("/")'>Go Home</button></body>`)   
-  } else res.send(`<link href="//pidgon.com/style.css" rel="stylesheet"><body align="center"><h1>O_o</h1>You are not an Ultimate Pidgon [Admin]. die.<br><button onclick='window.location.replace("/")'>Go Home</button></body>`)
-})
+app.get("/out", function (req, res) {
+  res.cookie("apcuuid", "", {
+    expires: new Date(Date.now()),
+  });
+  res.redirect("/");
+});
 
-app.post('/pidgon/subtract', function(req, res) {
-  var amount = parseFloat(req.body.amount)
-  var appdb = new Database(`./db/users/${req.cookies.apcuuid}.json`)
-  if(appdb.get('pidgon') == 'yes') {
-    if(users.has(req.body.person)) {
-      var uud = uuidv4()
-      var userdb = new Database(`./db/users/${users.get(req.body.person)}.json`)
-      userdb.subtract('balance', amount)
-      res.send(`<link href="//pidgon.com/style.css" rel="stylesheet"><body align="center"><h1>O_o</h1>Success! ${amount} pidgonCoins have been subtracted from ${req.body.person}.<br><button onclick='window.location.replace("/")'>Go Home</button></body>`)
-      log.set('pidgonID ' + uud, `Subtracted ${amount} from ${req.body.person} by Ultimate pidgon on ${new Date()}`)
-    } else res.send(`<link href="//pidgon.com/style.css" rel="stylesheet"><body align="center"><h1>O_o</h1>User does not exist.<br><button onclick='window.location.replace("/")'>Go Home</button></body>`)   
-  } else res.send(`<link href="//pidgon.com/style.css" rel="stylesheet"><body align="center"><h1>O_o</h1>You are not an Ultimate Pidgon.<br><button onclick='window.location.replace("/")'>Go Home</button></body>`)
-})
+app.get("/login", function (req, res) {
+  res.sendFile(path.join(__dirname + "/public/login.html"));
+});
 
-app.get('/user', function(req, res) {
-  if(fs.existsSync(`db/users/${req.cookies.apcuuid}.json`)) {
-    res.sendFile(path.join(__dirname + '/public/user.html'))
-  } else res.redirect('/login') 
-})
+app.post("/transfer", function (req, res) {
+  var amount = parseFloat(req.body.amount);
+  var person = req.body.person;
+  var user = req.cookies.apcuuid;
+  var userdb = new Database(`./db/users/${user}.json`);
+  var username = userdb.get("username");
+  if (amount > 0) {
+    if (amount > 0.001) {
+      if (users.has(person)) {
+        var uu = users.get(person);
+        var uj = new Database(`./db/users/${uu}.json`);
+        if (userdb.get("balance") >= amount) {
+          var uud = uuidv4();
+          if ("message" in req.body) {
+            userdb.subtract("balance", amount);
+            uj.add("balance", amount);
+            var message = req.body.message;
+            userdb.set(
+              "pidgonID " + uud,
+              `Transferred ${amount} to "${person}" with message "${message}" on ${new Date()}`
+            );
+            uj.set(
+              "pidgonID " + uud,
+              `"${username}" has given you ${amount} pidgonCoins with a message: "${message}" on ${new Date()}`
+            );
+            log.set(
+              "pidgonID " + uud,
+              `Transferred ${amount} to "${person}" from "${user}" with message on ${new Date()}`
+            );
+            res.send(
+              `<link href="/style.css" rel="stylesheet"><body align="center"><h1>O_o</h1>Transaction completed! <br> You have transfered ${amount} pidgonCoins to ${person} with the message ${message}! <br> <button onclick="window.location.replace('/appeal/${person}/${uud}/')">Pull Transaction</button><br><button onclick='window.location.replace("/")'>Go Home</button></body>`
+            );
+          } else {
+            userdb.subtract("balance", amount);
+            uj.add("balance", amount);
+            userdb.set(
+              "pidgonID " + uud,
+              `Transferred ${amount} to ${person} on ${new Date()}`
+            );
+            uj.set(
+              "pidgonID " + uud,
+              `"${person}" has given you ${amount} pidgonCoins on ${new Date()}!"`
+            );
+            log.set(
+              "pidgonID " + uud,
+              `Transferred ${amount} to ${person} from ${user} on ${new Date()}`
+            );
+            res.send(
+              `<link href="/style.css" rel="stylesheet"><body align="center"><h1>O_o</h1>Transaction completed! <br> You have transfered ${amount} pidgonCoins to ${person}! <br> <button onclick="window.location.replace('/appeal/${person}/${uud}/')">Pull Transaction</button><br><button onclick='window.location.replace("/")'>Go Home</button></body>`
+            );
+          }
+        } else
+          res.send(
+            `<link href="/style.css" rel="stylesheet"><body align="center"><h1>O_o</h1>Transaction failed.<br> you do not have enough money to make that transaction. None of your coins have been removed.<br><button onclick='window.location.replace("/")'>Go Home</button></body>`
+          );
+      } else
+        res.send(
+          `<link href="/style.css" rel="stylesheet"><body align="center"><h1>O_o</h1>Transaction failed.<br> The recipient does not exist. If you added an "@" symbol at the starting of the username, remove it and try again. None of your coins have been removed.<br><button onclick='window.location.replace("/")'>Go Home</button></body>`
+        );
+    } else
+      res.send(
+        `<link href="/style.css" rel="stylesheet"><body align="center"><h1>O_o</h1><br>You cannot transfer money lesser than 0.001. <br><button onclick='window.location.replace("/")'>Go Home</button></body>`
+      );
+  } else {
+    userdb.subtract("balance", 2);
+    res.send(
+      `<link href="/style.css" rel="stylesheet"><body align="center"><h1>O_o</h1>hold up.<br> You just tried removing money from someone else! 2 pidgonCoins have been removed from your account because you're mean.<br><button onclick='window.location.replace("/")'>Go Home</button></body>`
+    );
+  }
+});
 
-app.get('/pidgon', function(req, res) {
-  if(fs.existsSync(`db/users/${req.cookies.apcuuid}.json`)) {
-    console.log('exists')
-    var uus = new Database(`./db/users/${req.cookies.apcuuid}.json`) 
-    if(uus.get('pidgon') == 'yes') {
-      console.log('is pidgon')
-      res.sendFile(path.join(__dirname + '/public/super.html'))
-    } else {console.log('not pidgon'); res.redirect('/user')}
+app.get("/signup", function (req, res) {
+  res.sendFile(path.join(__dirname + "/public/signup.html"));
+});
 
-  } else res.redirect('/login') 
-})
+app.post("/login", function (req, res) {
+  var ur = req.body.username.toString().replace(/\./g, ",").toLowerCase();
+  console.log(ur);
+  if (users.has(ur)) {
+    var uu = new Database(`./db/users/${users.get(ur)}.json`);
+    bcrypt.compare(
+      req.body.password,
+      uu.get("password"),
+      function (err, result) {
+        if (result === true) {
+          if (uu.get("pidgon") == "yes") {
+            res.cookie("apcuuid", users.get(ur));
+            res.cookie("password", encodeURIComponent(req.body.password));
+            res.redirect("/pidgon");
+          } else {
+            res.cookie("apcuuid", users.get(ur));
+            res.cookie("password",  encodeURIComponent(req.body.password));
+            res.redirect("/user");
+          }
+        } else {
+          res.send(
+            `<link href="/style.css" rel="stylesheet"><body align="center"><h1>O_o</h1>Your password is wrong. <br><button onclick='window.location.replace("/login")'>Go Back</button></body>`
+          );
+        }
+      }
+    );
+  } else res.send(`<link href="/style.css" rel="stylesheet"><body align="center"><h1>O_o</h1>username does not exist. <br><button onclick='window.location.replace("/login")'>Go Back</button></body>`);
+});
 
-app.get('/appeal/:person/:uuid', function(req, res) {
-  var person = users.get(req.params.person)
-  var user = req.cookies.apcuuid
-  var uuid = req.params.uuid
-  if(log.has('pidgonID ' + uuid)) {
-    if(log.get('pidgonID ' + uuid).endsWith('- PULLED')) {
-    res.send(`<link href="//pidgon.com/style.css" rel="stylesheet"><body align="center"><h1>O_o</h1>Error. Your transaction has already been pulled.<br><button onclick='window.location.replace("/")'>Go Home</button></body>`)
+app.post("/signup", function (req, res) {
+  if (users.has(req.body.username.split(".").join())) {
+    res.send(
+      `<link href="/style.css" rel="stylesheet"><body align="center"><h1>O_o</h1>This username already exists.<br><button onclick='window.location.replace("/signup")'>Go Back</button></body>`
+    );
+  } else {
+    var uui = uuidv4();
+    var udb = new Database(`./db/users/${uui}.json`);
+    users.set(req.body.username.split(".").join().toLowerCase(), uui);
+    var us = new Database(`./db/users/${uui}.json`);
+    const hash = bcrypt.hashSync(req.body.password, saltRounds); 
+    us.set("username", req.body.username.toLowerCase());
+    us.set("password", hash);
+    us.set("pidgon", "no");
+    us.set("balance", 2);
+
+    res.cookie("apcuuid", uui);
+    res.cookie("password",  encodeURIComponent(req.body.password));
+    res.redirect("/user");
+  }
+});
+
+app.post("/verifycreds", function (req, res) {
+  let uuid = req.cookies.apcuuid;
+  let password = req.cookies.password;
+
+  console.log(`${uuid} ${password}`);
+  var user = new Database(`./db/users/${uuid}.json`);
+  let pwd = decodeURIComponent(password);
+  console.log(pwd)
+  bcrypt.compare(pwd, user.get("password"), function (err, result) {
+    if (result === true) {
+      console.log("creds right");
+      res.json({ status: true });
     } else {
-    var udb = new Database(`./db/users/${user}.json`)
-    var pdb = new Database(`./db/users/${person}.json`)
-    var stm = log.get('pidgonID ' + uuid)
-    var sspl = stm.split(' ')
-    var amount = parseFloat(sspl[1])
-    log.add('pidgonID ' + uuid, ' - PULLED')
-    udb.delete('pidgonID ' + uuid)
-    udb.add('balance', amount)
-    pdb.subtract('balance', amount)
-    res.send(`<link href="//pidgon.com/style.css" rel="stylesheet"><body align="center"><h1>O_o</h1>Success! Your transaction was pulled.<br><button onclick='window.location.replace("/")'>Go Home</button></body>`)
+      console.log("creds wrong");
+      res.cookie("apcuuid", "", {
+        expires: new Date(Date.now()),
+      });
+      res.cookie("password", "", {
+        expires: new Date(Date.now()),
+      });
+      res.json({ status: false });
     }
-  } else res.send(`<link href="//pidgon.com/style.css" rel="stylesheet"><body align="center"><h1>O_o</h1>Error. Your transaction does not exist.<br><button onclick='window.location.replace("/")'>Go Home</button></body>`)
-})
+  });
+});
+app.post("/pidgon/add", function (req, res) {
+  var amount = parseFloat(req.body.amount);
+  var appdb = new Database(`./db/users/${req.cookies.apcuuid}.json`);
+  if (appdb.get("pidgon") == "yes") {
+    if (users.has(req.body.person)) {
+      var uud = uuidv4();
+      var userdb = new Database(
+        `./db/users/${users.get(req.body.person)}.json`
+      );
+      userdb.add("balance", amount);
+      res.send(
+        `<link href="/style.css" rel="stylesheet"><body align="center"><h1>O_o</h1>Success! ${amount} pidgonCoins have been added to ${req.body.person}.<br><button onclick='window.location.replace("/")'>Go Home</button></body>`
+      );
+      log.set(
+        "pidgonID " + uud,
+        `Given ${amount} to ${req.body.person} from an Ultimate Pidgon.`
+      );
+    } else
+      res.send(
+        `<link href="/style.css" rel="stylesheet"><body align="center"><h1>O_o</h1>User does not exist.<br><button onclick='window.location.replace("/")'>Go Home</button></body>`
+      );
+  } else res.send(`<link href="/style.css" rel="stylesheet"><body align="center"><h1>O_o</h1>You are not an Ultimate Pidgon [Admin].<br><button onclick='window.location.replace("/")'>Go Home</button></body>`);
+});
 
-app.get('/source/bloop', function(req, res) {
-    res.sendFile(path.join(__dirname + '/public/bloop.js'))
-})
+app.post("/pidgon/subtract", function (req, res) {
+  var amount = parseFloat(req.body.amount);
+  var appdb = new Database(`./db/users/${req.cookies.apcuuid}.json`);
+  if (appdb.get("pidgon") == "yes") {
+    if (users.has(req.body.person)) {
+      var uud = uuidv4();
+      var userdb = new Database(
+        `./db/users/${users.get(req.body.person)}.json`
+      );
+      userdb.subtract("balance", amount);
+      res.send(
+        `<link href="/style.css" rel="stylesheet"><body align="center"><h1>O_o</h1>Success! ${amount} pidgonCoins have been subtracted from ${req.body.person}.<br><button onclick='window.location.replace("/")'>Go Home</button></body>`
+      );
+      log.set(
+        "pidgonID " + uud,
+        `Subtracted ${amount} from ${
+          req.body.person
+        } by Ultimate pidgon on ${new Date()}`
+      );
+    } else
+      res.send(
+        `<link href="/style.css" rel="stylesheet"><body align="center"><h1>O_o</h1>User does not exist.<br><button onclick='window.location.replace("/")'>Go Home</button></body>`
+      );
+  } else res.send(`<link href="/style.css" rel="stylesheet"><body align="center"><h1>O_o</h1>You are not an Ultimate Pidgon.<br><button onclick='window.location.replace("/")'>Go Home</button></body>`);
+});
 
-app.get('/source/em', function(req, res) {
-    res.sendFile(path.join(__dirname + '/public/34.js'))
-})
+app.get("/user", function (req, res) {
+  if (fs.existsSync(`db/users/${req.cookies.apcuuid}.json`)) {
+    res.sendFile(path.join(__dirname + "/public/user.html"));
+  } else res.redirect("/login");
+});
 
-app.get('/card/css', function(req, res) {
-    res.sendFile(path.join(__dirname + '/public/card.css'))
-})
-app.get('/card/js', function(req, res) {
-    res.sendFile(path.join(__dirname + '/public/card.js'))
-})
-
-app.get('/card/learn', function(req, res) {
-    res.sendFile(path.join(__dirname + '/public/learn.html'))
-})
-
-app.get('/card/transfer', function(req, res) {
-    res.sendFile(path.join(__dirname + '/public/cardtrans.html'))
-})
-
-app.get('/card/transfer/:name/:pin', function(req, res) {
-    res.sendFile(path.join(__dirname + '/public/cardtransAuto.html'))
-})
-
-app.get('/card', function(req, res) {
-  if(fs.existsSync(`db/users/${req.cookies.apcuuid}.json`) && req.cookies.apcuuid !== null && req.cookies.apcuuid !== 'undefined'&& req.cookies.apcuuid !== undefined) {
-var user = new Database(`./db/users/${req.cookies.apcuuid}.json`)
-    if(user.has('cardnumber') && user.has('pin')){
-      res.sendFile(path.join(__dirname + '/public/card.html'))
+app.get("/pidgon", function (req, res) {
+  if (fs.existsSync(`db/users/${req.cookies.apcuuid}.json`)) {
+    console.log("exists");
+    var uus = new Database(`./db/users/${req.cookies.apcuuid}.json`);
+    if (uus.get("pidgon") == "yes") {
+      console.log("is pidgon");
+      res.sendFile(path.join(__dirname + "/public/super.html"));
     } else {
-     res.sendFile(path.join(__dirname + '/public/setpin.html'))
-      
+      console.log("not pidgon");
+      res.redirect("/user");
     }
-    
-  } else res.redirect('/signup')
-    
-})
+  } else res.redirect("/login");
+});
 
-app.get('/setpin', function(req, res) {
-  res.sendFile(path.join(__dirname + '/public/setpin.html'))
-})
-app.post('/setpin', function(req, res) {
-  console.log(req.cookies.apcuuid)
- var user = new Database(`./db/users/${req.cookies.apcuuid}.json`)
- user.set('cardnumber', translator.new().slice(0, 12))
-  user.set('pin', pidgon.encrypt(req.body.pin))
-  res.redirect('/card')
-})
+app.get("/appeal/:person/:uuid", function (req, res) {
+  var person = users.get(req.params.person);
+  var user = req.cookies.apcuuid;
+  var uuid = req.params.uuid;
+  if (log.has("pidgonID " + uuid)) {
+    if (log.get("pidgonID " + uuid).endsWith("- PULLED")) {
+      res.send(
+        `<link href="/style.css" rel="stylesheet"><body align="center"><h1>O_o</h1>Error. Your transaction has already been pulled.<br><button onclick='window.location.replace("/")'>Go Home</button></body>`
+      );
+    } else {
+      var udb = new Database(`./db/users/${user}.json`);
+      var pdb = new Database(`./db/users/${person}.json`);
+      var stm = log.get("pidgonID " + uuid);
+      var sspl = stm.split(" ");
+      var amount = parseFloat(sspl[1]);
+      log.add("pidgonID " + uuid, " - PULLED");
+      udb.delete("pidgonID " + uuid);
+      udb.add("balance", amount);
+      pdb.subtract("balance", amount);
+      res.send(
+        `<link href="/style.css" rel="stylesheet"><body align="center"><h1>O_o</h1>Success! Your transaction was pulled.<br><button onclick='window.location.replace("/")'>Go Home</button></body>`
+      );
+    }
+  } else res.send(`<link href="/style.css" rel="stylesheet"><body align="center"><h1>O_o</h1>Error. Your transaction does not exist.<br><button onclick='window.location.replace("/")'>Go Home</button></body>`);
+});
 
+app.get("/source/bloop", function (req, res) {
+  res.sendFile(path.join(__dirname + "/public/bloop.js"));
+});
 
-app.post('/card/transact', function(req, res) {
-  const uud = uuidv4()
- if(users.has(req.body.username) && users.has(req.body.otherusername)) {
-   var user = new Database(`./db/users/${users.get(req.body.username)}.json`)
-      var otheruser = new Database(`./db/users/${users.get(req.body.otherusername)}.json`)
-   if(pidgon.decrypt(user.get('pin')) == req.body.pin) {
-     user.subtract('balance', parseInt(req.body.money))
-     otheruser.add('balance', parseInt(req.body.money))
-     user.set('pidgonID ' + uud, `Transferred ${req.body.money} to ${req.body.otherusername} by PidgonCard on ${new Date()}`)
-        otheruser.set('pidgonID ' + uud, `"${req.body.username}" has given you ${req.body.money} pidgonCoins on ${new Date()}!"`)
-        log.set('pidgonID ' + uud, `Transferred ${req.body.money} to ${req.body.otherusername} from ${req.body.username} by PidgonCard on ${new Date()}`)
-         res.send(`<link href="//pidgon.com/style.css" rel="stylesheet"><body align="center"><h1:O</h1>Your PidgonCard transaction has completed!<br><button onclick='window.location.replace("/")'>Go Home</button></body>`)
-   } else res.send(`<link href="//pidgon.com/style.css" rel="stylesheet"><body align="center"><h1>O_o</h1>Your PidgonCard PIN is wrong<br><button onclick='window.location.replace("/card/transfer")'>Try again</button></body>`)
- } else res.send(`<link href="//pidgon.com/style.css" rel="stylesheet"><body align="center"><h1>O_o</h1>The cardholder or the transactee does not exist.<br><button onclick='window.location.replace("/card/transfer")'>Try again</button></body>`)
-})
+app.get("/source/em", function (req, res) {
+  res.sendFile(path.join(__dirname + "/public/34.js"));
+});
 
+app.get("/card/css", function (req, res) {
+  res.sendFile(path.join(__dirname + "/public/card.css"));
+});
+app.get("/card/js", function (req, res) {
+  res.sendFile(path.join(__dirname + "/public/card.js"));
+});
 
-app.get('/card/mail', function(req, res) {
-     res.sendFile(path.join(__dirname + '/public/cardmail.html'))
-})
+app.get("/card/learn", function (req, res) {
+  res.sendFile(path.join(__dirname + "/public/learn.html"));
+});
 
-app.get('/card/@:name', function(req, res) {
-  if(users.has(req.params.name)) {
-    var user = new Database(`./db/users/${users.get(req.params.name)}.json`)
+app.get("/card/transfer", function (req, res) {
+  res.sendFile(path.join(__dirname + "/public/cardtrans.html"));
+});
+
+app.get("/card/transfer/:name/:pin", function (req, res) {
+  res.sendFile(path.join(__dirname + "/public/cardtransAuto.html"));
+});
+
+app.get("/card", function (req, res) {
+  if (
+    fs.existsSync(`db/users/${req.cookies.apcuuid}.json`) &&
+    req.cookies.apcuuid !== null &&
+    req.cookies.apcuuid !== "undefined" &&
+    req.cookies.apcuuid !== undefined
+  ) {
+    var user = new Database(`./db/users/${req.cookies.apcuuid}.json`);
+    if (user.has("cardnumber") && user.has("pin")) {
+      res.sendFile(path.join(__dirname + "/public/card.html"));
+    } else {
+      res.sendFile(path.join(__dirname + "/public/setpin.html"));
+    }
+  } else res.redirect("/signup");
+});
+
+app.get("/setpin", function (req, res) {
+  res.sendFile(path.join(__dirname + "/public/setpin.html"));
+});
+app.post("/setpin", function (req, res) {
+  console.log(req.cookies.apcuuid);
+  var user = new Database(`./db/users/${req.cookies.apcuuid}.json`);
+  user.set("cardnumber", translator.new().slice(0, 12));
+  let hash = bcrypt.hashSync(req.body.pin, saltRounds);
+  user.set("pin", hash);
+  res.redirect("/card");
+});
+
+app.post("/card/transact", function (req, res) {
+  const uud = uuidv4();
+  if (users.has(req.body.username) && users.has(req.body.otherusername)) {
+    var user = new Database(`./db/users/${users.get(req.body.username)}.json`);
+    var otheruser = new Database(
+      `./db/users/${users.get(req.body.otherusername)}.json`
+    );
+    let comparePIN = bcrypt.compareSync(req.body.pin, user.get("pin"));
+    if (comparePIN === true) {
+      user.subtract("balance", parseInt(req.body.money));
+      otheruser.add("balance", parseInt(req.body.money));
+      user.set(
+        "pidgonID " + uud,
+        `Transferred ${req.body.money} to ${
+          req.body.otherusername
+        } by PidgonCard on ${new Date()}`
+      );
+      otheruser.set(
+        "pidgonID " + uud,
+        `"${req.body.username}" has given you ${
+          req.body.money
+        } pidgonCoins on ${new Date()}!"`
+      );
+      log.set(
+        "pidgonID " + uud,
+        `Transferred ${req.body.money} to ${req.body.otherusername} from ${
+          req.body.username
+        } by PidgonCard on ${new Date()}`
+      );
+      res.send(
+        `<link href="/style.css" rel="stylesheet"><body align="center"><h1:O</h1>Your PidgonCard transaction has completed!<br><button onclick='window.location.replace("/")'>Go Home</button></body>`
+      );
+    } else
+      res.send(
+        `<link href="/style.css" rel="stylesheet"><body align="center"><h1>O_o</h1>Your PidgonCard PIN is wrong<br><button onclick='window.location.replace("/card/transfer")'>Try again</button></body>`
+      );
+  } else res.send(`<link href="/style.css" rel="stylesheet"><body align="center"><h1>O_o</h1>The cardholder or the transactee does not exist.<br><button onclick='window.location.replace("/card/transfer")'>Try again</button></body>`);
+});
+
+app.get("/card/mail", function (req, res) {
+  res.sendFile(path.join(__dirname + "/public/cardmail.html"));
+});
+
+app.get("/card/@:name", function (req, res) {
+  if (users.has(req.params.name)) {
+    var user = new Database(`./db/users/${users.get(req.params.name)}.json`);
     res.send(`<html>
   <head><style>
     @import url('https://fonts.googleapis.com/css2?family=Rubik:wght@700&display=swap');
@@ -498,7 +637,12 @@ body {
       <div class="paywave svg"></div>
       <div class="chips svg"></div>
       <div class="card_no text">
-        ${user.get('cardnumber').split('-').join('').match(/.{1,4}/g).join('-')}
+        ${user
+          .get("cardnumber")
+          .split("-")
+          .join("")
+          .match(/.{1,4}/g)
+          .join("-")}
       </div>
       <div class="valid_date text" style="font-family: 'Rubik';" align="center">
       </div>
@@ -506,16 +650,16 @@ body {
     </div>
   </div>
 </body>
-</html>`)
-  } else res.send(`<h1>Error</h1>`)
-})
-app.post('/card/mail', function(req, res) {
-  var user = new Database(`./db/users/${users.get(req.body.name)}.json`)
-   var message = {
-        from: 'noreply@pidgon.com',
-        to: req.body.email,
-        subject: 'Your PidgonCard!',
-        html: `<html>
+</html>`);
+  } else res.send(`<h1>Error</h1>`);
+});
+app.post("/card/mail", function (req, res) {
+  var user = new Database(`./db/users/${users.get(req.body.name)}.json`);
+  var message = {
+    from: "mihir@pidgon.com",
+    to: req.body.email,
+    subject: "Your PidgonCard!",
+    html: `<html>
   <head><style>
     @import url('https://fonts.googleapis.com/css2?family=Rubik:wght@700&display=swap');
 @import url('https://fonts.googleapis.com/css2?family=Roboto+Mono:wght@400&display=swap');
@@ -725,7 +869,12 @@ body {
       <div class="paywave svg"></div>
       <div class="chips svg"></div>
       <div class="card_no text">
-        ${user.get('cardnumber').split('-').join('').match(/.{1,4}/g).join('-')}
+        ${user
+          .get("cardnumber")
+          .split("-")
+          .join("")
+          .match(/.{1,4}/g)
+          .join("-")}
       </div>
       <div class="valid_date text" style="font-family: 'Rubik';" align="center">
       </div>
@@ -733,25 +882,31 @@ body {
     </div>
   </div>
 </body>
-</html>`
-      };
-      
-      transporter.sendMail(message, function(error, info){
-        if(error){
-          console.log(error)
-        }else{
-           console.log(info.response);
-        };
-      });
-  res.send(`<link href="//pidgon.com/style.css" rel="stylesheet"><body align="center"><h1>O_o</h1>Success! Your card has been emailed to you!<br><button onclick='window.location.replace("/")'>Go Home</button></body>`)
-})
+</html>`,
+  };
 
-app.get('*', function(req, res){
-  res.sendFile(path.join(__dirname + '/public/404.html'))
-  //res.status(404).send(`<html><head><title>404 | PidgonCoin</title><link rel="stylesheet" href="https://unpkg.com/purecss@2.0.6/build/pure-min.css" integrity="sha384-Uu6IeWbM+gzNVXJcM9XV3SohHtmWE+3VGi496jvgX1jyvDTXfdK+rfZc8C1Aehk5" crossorigin="anonymous">	<link href="//pidgon.com/style.css" rel="stylesheet"></head><body align="center"> <h1>¯\(°_o)/¯</h1> <p>rong paeg</p>  <p>trenslashun: wrong page</p><br><button onclick='window.location.replace("/")'>Go Home</button></body></html>`);
+  transporter.sendMail(message, function (error, info) {
+    if (error) {
+      console.log(error);
+    } else {
+      console.log(info.response);
+    }
+  });
+  res.send(
+    `<link href="/style.css" rel="stylesheet"><body align="center"><h1>O_o</h1>Success! Your card has been emailed to you!<br><button onclick='window.location.replace("/")'>Go Home</button></body>`
+  );
+});
+
+app.get("/style.css", function (req, res) {
+  res.sendFile(path.join(__dirname + "/public/style.css"));
+});
+
+app.get("*", function (req, res) {
+  res.sendFile(path.join(__dirname + "/public/404.html"));
+  //res.status(404).send(`<html><head><title>404 | PidgonCoin</title><link rel="stylesheet" href="https://unpkg.com/purecss@2.0.6/build/pure-min.css" integrity="sha384-Uu6IeWbM+gzNVXJcM9XV3SohHtmWE+3VGi496jvgX1jyvDTXfdK+rfZc8C1Aehk5" crossorigin="anonymous">	<link href="/style.css" rel="stylesheet"></head><body align="center"> <h1>¯\(°_o)/¯</h1> <p>rong paeg</p>  <p>trenslashun: wrong page</p><br><button onclick='window.location.replace("/")'>Go Home</button></body></html>`);
 });
 
 //porting
-app.use('/', router);
+app.use("/", router);
 app.listen(3000);
-console.log('Pidgon Initiated. \n App running at port 3000');
+console.log("Pidgon Initiated. \n App running at port 3000");
