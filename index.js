@@ -908,5 +908,5 @@ app.get("*", function (req, res) {
 
 //porting
 app.use("/", router);
-app.listen(3000);
-console.log("Pidgon Initiated. \n App running at port 3000");
+app.listen(PORT);
+console.log(`Pidgon Initiated. \n App running at port ${PORT}`);
