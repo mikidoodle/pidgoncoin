@@ -1,14 +1,13 @@
-# Welcome!
+# PidgonCoin!
 In this file:<Br /><Br />
-[Welcome!](#Welcome!)  
 [Screenshots](#Screenshots)  
 [Setup](#Setup)  
 [Improvements](#Improvements)<Br /><Br />
-PidgonCoin is a toy currency I built when I was 11, using HTML/CSS, jQuery, Node.js (via Express.js) and JSON for the database.
+PidgonCoin is a toy currency I built when I was 11 (so don't shame me for the vulnerabilities) using HTML/CSS, jQuery, and Express.js.
 <Br >
 
-The site is minimal and all options are simple and esasy to understand. Users can log in and sign up without an email and can transfer and mine money. I also had plans for a physical card, so you can see a bit of the early infrastructure for the card on the site.
-Super users on the site are called "Ultimate Pidgons" and can add/subtract money from users. They can also view a log of all transactions. Users also earn badges for the amount of transactions they've completed.
+The site is super minimal and all options are super simple. Users can log in and sign up without an email and can transfer and mine money. I also had plans for a physical card, so you can see a bit of the early infrastructure for the card on the site.
+Super users on the site are called "Super Pidgons" and can add/subtract money from users. They can also view a log of all transactions. Users also earn badges for the amount of transactions they've completed.
 
 # Screenshots
 ![Login Page](https://github.com/mikidoodle/pidgoncoin/assets/91926675/90ba5509-15eb-46bd-9ccd-04464076f8a3)
@@ -23,8 +22,4 @@ Setup is simple. Just run `npm i && node index.js` to download all packages, fol
 
 # Improvements
 
-This site is obviously not optimally written, and there are a bunch of improvements I could make if I had the time. If you are interested in doing so, feel free to submit a pull request with your changes. Here are a few improvements you could do:
-- Move the database from JSON to Postgres/SQL
-- Convert HTML files to jsx or eJS
-- Fix/Align UI elements
-- Add exception handling, which for some reason I didn't do
+ngl this site is horrendous from a security perspective. past-mihi decided that publicly exposed JSON files are easier than a DB, the site doesn't ask for or verify emails, and above all, it's not hard to give yourself an avogadro amount of coins lmao. Feel free to submit a fix if you're up for it!
