@@ -23,3 +23,7 @@ Setup is simple. Just run `npm i && node index.js` to download all packages, fol
 # Improvements
 
 ngl this site is horrendous from a security perspective. past-mihi decided that publicly exposed JSON files are easier than a DB, the site doesn't ask for or verify emails, and above all, it's not hard to give yourself an avogadro amount of coins lmao. Feel free to submit a fix if you're up for it!
+
+# Beware of scammers
+
+PidgonCoin is not a real currency or cryptocurrency. Any cryptocurrency claiming to be made by me that resembles PidgonCoin or any other project I created is a scam designed to steal your money. I do not endorse any cryptocurrency or project, nor have I created any cryptocurrencies on any memecoin launchpads. Avoid all interactions with people claiming that I have endorsed any cryptocurrency.
